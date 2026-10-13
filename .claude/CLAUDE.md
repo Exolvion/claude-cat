@@ -13,6 +13,7 @@ A Claude Code mod (a plugin of function hooks) that draws a pixel cat on the lin
 | `hooks/scene.ts` | Pure. Poses, moods, captions, the room scene and the prompt-line scene. No `claude-code` import, so `tools/render.mjs` can run it. |
 | `hooks/sprites.ts` | Pure. Coat palettes, sprite strings, pixel layers, packing cells for a `Raster`. |
 | `types/index.d.ts` | The data model (`CatData`, `CatView`, the setting types) and the `PluginState` contract. |
+| `skills/cat-help/SKILL.md` | Usage guide that ships with the plugin. In installed sessions Claude reads it when someone asks about the cat. Keep it in step with the commands, the settings and `HELP` in `register.tsx`. |
 | `tests/pixel-cat.test.ts` | Engine tests, run by `claude plugin test .`. |
 | `tools/typecheck.mjs` | Type check against Claude Code's API declarations. |
 | `tools/render.mjs` | Renders the drawings to PNG in `tools/out/` for checking art. `--docs` refreshes `docs/images/`. |
@@ -31,12 +32,12 @@ A Claude Code mod (a plugin of function hooks) that draws a pixel cat on the lin
 
 ## Edit loop
 
-1. Make the change.
+1. Make the change. If people will notice it (a command, a setting, a behaviour), update `skills/cat-help/SKILL.md`, `HELP` in `register.tsx` and the README as well.
 2. `claude plugin validate .`
 3. `claude plugin test .`
 4. `node tools/typecheck.mjs <path to claude-code.d.ts>` (finding the path is below).
 5. For any art change, `node tools/render.mjs` and look at `tools/out/*.png` before shipping. `--docs` updates the README images.
-6. Commit and push. Where the cat is installed from a local clone, `git pull` there, then `/reload-plugins` in Claude Code.
+6. Bump `version` in `plugin.json` for anything people who installed from GitHub should get (`claude plugin update` compares it). Commit and push. Where the cat is installed from a local clone, `git pull` there, then `/reload-plugins` in Claude Code.
 
 **The API declarations** (`claude-code.d.ts`) are written by Claude Code and are not committed. Two ways to get them:
 - In a session, load the `plugin-authoring` skill. Its text names the path of this build's file.

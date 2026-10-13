@@ -257,10 +257,16 @@ async function setting($: Engine, key: SettingKey, value: string): Promise<strin
 
 /* ---------- commands ---------- */
 
+// Keep in step with skills/cat-help/SKILL.md, the longer guide Claude reads.
+const HELP = 'Cat commands: /cat opens or closes the room, /cat settings, /cat feed, play, cuddle or treat, '
+  + '/cat name <name>, /cat hide or show. In the room, click it to use the keys f p c t s x. '
+  + 'Each finished Claude reply adds a kibble. The room docks at the side under /tui fullscreen at 110+ columns.'
+
 async function runCommand($: Engine, args: string): Promise<string> {
   const [sub = '', ...rest] = args.trim().split(/\s+/).filter(Boolean)
   const word = sub.toLowerCase()
   if (!word) return toggleRoom($)
+  if (word === 'help') return HELP
   if (word === 'open' || word === 'room') return openRoom($)
   if (word === 'close') return closeRoom($)
   if (word === 'settings' || word === 'set') return openSettings($)
@@ -281,7 +287,7 @@ async function runCommand($: Engine, args: string): Promise<string> {
       ? `${live.cat.name} left the prompt line. /cat show brings it back.`
       : `${live.cat.name} is back on the prompt line.`
   }
-  return 'Try /cat to open the room, /cat settings, /cat feed, /cat play, /cat cuddle, /cat treat, /cat name <name>, /cat hide or /cat show.'
+  return `Not a /cat command. ${HELP}`
 }
 
 /* ---------- animation ---------- */
@@ -350,7 +356,7 @@ export const register: Register = on => {
     await $.command.register({
       name: 'cat',
       description: 'Your pixel cat. Opens its room, or settings, feed, play, cuddle, treat, name, hide, show.',
-      argumentHint: '[settings | feed | play | cuddle | treat | close | name <name> | hide | show]',
+      argumentHint: '[help | settings | feed | play | cuddle | treat | close | name <name> | hide | show]',
     })
     await load($)
     return next(e)

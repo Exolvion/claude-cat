@@ -69,7 +69,8 @@ test('commands rename, recolour and hide the cat', async ($, on) => {
   expect((await run($, 'hide')).text).toBe('Biscuit left the prompt line. /cat show brings it back.')
   expect((await band($)).raster).toBeUndefined()
   expect((await run($, 'show')).text).toBe('Biscuit is back on the prompt line.')
-  expect((await run($, 'dance')).text).toMatch(/^Try \/cat/)
+  expect((await run($, 'dance')).text).toMatch(/^Not a \/cat command\. Cat commands:/)
+  expect((await run($, 'help')).text).toMatch(/^Cat commands: \/cat opens or closes the room/)
 })
 
 test('by default the band is one row: a small cat with its bowl and a one-word caption', async ($, on) => {

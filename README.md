@@ -36,6 +36,7 @@ Needs Claude Code 2.1.287 or later (the mods API) and a terminal with true colou
 | --- | --- |
 | `/cat` | Opens or closes the room. Esc also closes it. |
 | `/cat settings` | Size, where it sits, side, caption and coat. Tab moves, arrows choose, Enter sets. |
+| `/cat help` | A short guide. You can also ask Claude about the cat: the plugin ships a guide Claude reads when the cat comes up. |
 | `/cat feed`, `play`, `cuddle`, `treat` | Care for it without opening the room. Treats: three a day. |
 | `/cat name Biscuit` | Renames it. |
 | `/cat hide`, `/cat show` | Takes it off the prompt line, or brings it back. |

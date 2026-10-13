@@ -1,0 +1,9 @@
+{
+  "name": "pixel-cat",
+  "version": "0.2.0",
+  "author": { "name": "Exolvion" },
+  "description": "A pixel cat that sits on your Claude Code prompt line, earns kibble from finished replies, and has a room in a side pane.",
+  "homepage": "https://github.com/Exolvion/claude-cat",
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

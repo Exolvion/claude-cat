@@ -1,0 +1,6 @@
+{
+  "name": "pixel-cat",
+  "owner": { "name": "Exolvion" },
+  "description": "Claude Cat, a pixel cat mod for Claude Code",
+  "plugins": [{ "name": "pixel-cat", "source": "./" }]
+}

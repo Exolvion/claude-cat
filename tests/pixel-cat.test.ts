@@ -218,3 +218,15 @@ test('the sitting cats take five and six rows, with the tail beside the body', a
     await ui.unmount()
   }
 })
+
+test('the menu in the band corner and the name both open the room', async ($, on) => {
+  const { seen } = ground(on)
+  await start($)
+  for (const key of ['menu', 'name']) {
+    const ui = await $.ui.mount({ plugin: 'pixel-cat', surface: 'terminal', ...BAND })
+    await ui.press({ key })
+    expect(seen.opens.at(-1)?.id).toBe('cat-room')
+    await ui.unmount()
+    await run($, 'close')
+  }
+})

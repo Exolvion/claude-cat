@@ -13,7 +13,7 @@ You cannot run `/cat` yourself. Tell the person exactly what to type.
 
 | Type | What it does |
 | --- | --- |
-| `/cat` | Opens or closes the room. Esc also closes it. Clicking the cat's name, or the `≡` beside it, on the prompt line opens it too. |
+| `/cat` | Opens or closes the room. Esc also closes it. Clicking the cat's name, or the `≡` at the prompt line's top right, opens it too. Clicks only work under `/tui fullscreen`; elsewhere use `/cat`. |
 | `/cat settings` | Opens the settings window. |
 | `/cat help` | Prints a short guide. |
 | `/cat feed` | Eats one kibble from the bowl. Each finished Claude reply adds one, up to five. |

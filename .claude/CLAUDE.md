@@ -26,7 +26,7 @@ A Claude Code mod (a plugin of function hooks) that draws a pixel cat on the lin
 - **Time.** `decay()` applies real elapsed time on load and once a minute: a full belly lasts about a day, energy drains while awake and refills while asleep or while Claude Code is closed.
 - **Events.** `turn.start` and `turn.complete` make the cat watch, and a main-agent reply (no `agentId`, not aborted) adds a kibble. A `tool.call` result with `isError` startles it. `prompt.submit` wakes it. Ten minutes with no prompt puts it to sleep.
 - **Drawing.** `scene.ts` builds a pixel `Layer`. `encode()` packs it into a `Raster`'s cells: one cell is two pixels (the upper half block, foreground on top, background below), and an empty pixel is the terminal's default colour, so the cat works on light and dark themes. `tick()` runs every 333 ms, re-encodes, and calls `$.ui.blit` only when the cells changed. Render hooks redraw whenever the state they read changes.
-- **Prompt line** (the `AbovePrompt` band). Settings: `look` (small, big, ascii, face), `spot` (over, rows), `side` (right, left), `caption` (mood, news, off). With `spot: 'over'` on the right, the band is one row tall and the drawing sits in a `Box` with `position: "absolute"` and a negative `top`, so it paints over the empty space above. A thought bubble shows a need (hungry `><>`, sleepy `zZ`, bored yarn); a mini bowl shows one pixel per kibble.
+- **Prompt line** (the `AbovePrompt` band). Settings: `look` (small, big, ascii, face), `side` (right, left), `caption` (mood, news, off), `coat`. The band is as tall as the drawing. Any choice typed alone (`/cat big`) sets it, except `off`. A thought bubble shows a need (hungry `><>`, sleepy `zZ`, bored yarn); a mini bowl shows one pixel per kibble.
 - **Room.** Pane `cat-room`: docks beside the transcript under `/tui fullscreen` at 110+ columns, otherwise opens above the prompt. Feed, Play, Cuddle, Treat, Settings and Close buttons with hotkeys f, p, c, t, s, x.
 - **Settings.** Pane `cat-settings`, opened with `focus` and `closeOnEscape`, one `Select` per setting. Each pick saves at once.
 
@@ -55,10 +55,8 @@ A Claude Code mod (a plugin of function hooks) that draws a pixel cat on the lin
 - The store file is keyed by plugin and marketplace name: `~/.claude/plugins/store/pixel-cat_pixel-cat-<hash>.json`. Renaming either starts a new cat unless that JSON is copied across.
 - Headless checks (`claude -p "/cat ..."`) run against the real installed cat and save to its store. `/cat size check` is a harmless probe; avoid feed, play and the like. In Git Bash, prefix with `MSYS_NO_PATHCONV=1`, or `/cat` turns into a Windows path.
 - A `command.run` answer's `text` is also read by the model, so keep it short.
-
-## Open questions
-
-- `spot: 'over'` passes the engine's tree validation, but it is unconfirmed that every terminal paints the full cat above the band, and how it looks when long output lines run under it. Ask for a screenshot after changing it.
+- The band clips its drawing to itself. An absolute `Box` with a negative `top` (the old `spot: 'over'`, a one-row band with the cat rising above it) showed only the cat's bottom row, seen on Windows Terminal with 2.1.296, before and after limiting it to fullscreen. So the band is always as tall as the drawing. Do not bring `over` back; old saves that still hold `spot` are ignored.
+- The band is shared. Any other mod that draws in `AbovePrompt` runs after the cat's hook. Always `await next(e)` and draw its result above the cat's line; returning the cat alone hides every other mod's band.
 
 ## Maintainer preferences
 

@@ -19,7 +19,7 @@ const pane = (requestId: string, placement: 'dock' | 'inline' = 'dock', surface:
 
 // Stands in for the engine beneath the plugin: the calls the cat makes on $.
 type Seen = { opens: { id: string; focus?: true; closeOnEscape?: true }[]; blits: number }
-const ground = (on: On, stored?: Record<string, unknown>) => {
+const ground = (on: On, stored?: Record<string, unknown>, beneath?: string) => {
   mock.store(on, stored)
   const clock = mock.clock(on)
   const seen: Seen = { opens: [], blits: 0 }
@@ -31,7 +31,9 @@ const ground = (on: On, stored?: Record<string, unknown>) => {
   on('ui.close', ($, e) => { open.delete(e.id); return { value: undefined } })
   on('ui.blit', () => { seen.blits++; return { value: {} } })
   // What the engine draws in the band when the cat steps aside: an empty row.
-  on('ui.render', { component: 'AbovePrompt' }, ($, e) => h($.ui.resolve(e).Box, {}) as RenderElement)
+  // With `beneath`, another mod's line instead.
+  on('ui.render', { component: 'AbovePrompt' }, ($, e) =>
+    (beneath ? h($.ui.resolve(e).Text, {}, beneath) : h($.ui.resolve(e).Box, {})) as RenderElement)
   return { clock, seen }
 }
 
@@ -51,6 +53,12 @@ const band = async ($: Engine) => {
   return found
 }
 
+// The band is the other mods' drawing above the cat's own line; this is that line.
+type Drawn = { props: { height?: number; flexDirection?: string }; children?: Drawn[] }
+function catLine(drawn: unknown): Drawn {
+  const root = drawn as Drawn
+  return root.props.flexDirection === 'column' ? root.children!.at(-1)! : root
+}
 test('a new cat eats one kibble, then is too full for more', async ($, on) => {
   ground(on)
   await start($)
@@ -73,7 +81,7 @@ test('commands rename, recolour and hide the cat', async ($, on) => {
   expect((await run($, 'help')).text).toMatch(/^Cat commands: \/cat opens or closes the room/)
 })
 
-test('by default the band is one row: a small cat with its bowl and a one-word caption', async ($, on) => {
+test('by default the band is a small cat in three rows, with its bowl and a one-word caption', async ($, on) => {
   ground(on)
   await start($)
   const ui = await $.ui.mount({ plugin: 'pixel-cat', surface: 'terminal', ...BAND })
@@ -81,8 +89,8 @@ test('by default the band is one row: a small cat with its bowl and a one-word c
   expect(raster?.props.columns).toBe(26)
   expect(raster?.props.rows).toBe(3)
   expect((await ui.find({ type: 'Text', text: /Mochi/ }))?.text).toMatch(/Mochi · loafing/)
-  const root = (await ui.drawn()) as unknown as { props: { height?: number } }
-  expect(root.props.height).toBe(1)
+  const root = catLine(await ui.drawn())
+  expect(root.props.height).toBe(3)
   await ui.unmount()
 })
 
@@ -99,9 +107,30 @@ test('the settings window changes the band as soon as a choice is made', async (
   await ui.select({ key: 'caption', value: 'off' })
   expect((await band($)).caption).toBeUndefined()
   await ui.select({ key: 'look', value: 'big' })
-  await ui.select({ key: 'spot', value: 'rows' })
   expect((await band($)).raster?.props.rows).toBe(4)
   await ui.unmount()
+})
+
+test('the band is as tall as the cat in both renderers, since the engine clips a drawing to it', async ($, on) => {
+  ground(on)
+  await start($)
+  await run($, 'big')
+  for (const isFullscreen of [true, false]) {
+    const ui = await $.ui.mount({ plugin: 'pixel-cat', surface: 'terminal', ...BAND, viewport: { ...VIEWPORT, isFullscreen } })
+    expect((await ui.find({ type: 'Raster', key: 'cat' }))?.props.rows).toBe(4)
+    const root = catLine(await ui.drawn())
+    expect(root.props.height).toBe(4)
+    await ui.unmount()
+  }
+})
+
+test('a choice typed alone sets it', async ($, on) => {
+  ground(on)
+  await start($)
+  expect((await run($, 'big')).text).toBe('Size set to big.')
+  expect((await run($, 'Smoke')).text).toBe('Coat set to smoke.')
+  expect((await run($, 'left')).text).toBe('Side set to left.')
+  expect((await run($, 'off')).text).toMatch(/^Not a \/cat command\./)
 })
 
 test('the old typed settings still work', async ($, on) => {
@@ -164,5 +193,14 @@ test('after a reload with no session start, the band draws and its timer animate
   expect(await ui.find({ type: 'Raster', key: 'cat' })).toBeDefined()
   await clock.advance(20_000)
   expect(seen.blits).toBeGreaterThan(0)
+  await ui.unmount()
+})
+
+test('the cat leaves room in the band for what other mods draw there', async ($, on) => {
+  ground(on, undefined, 'another mod')
+  await start($)
+  const ui = await $.ui.mount({ plugin: 'pixel-cat', surface: 'terminal', ...BAND })
+  expect(await ui.find({ type: 'Text', text: 'another mod' })).toBeDefined()
+  expect(await ui.find({ type: 'Raster', key: 'cat' })).toBeDefined()
   await ui.unmount()
 })

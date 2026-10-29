@@ -8,7 +8,7 @@ Unofficial. A community mod, not made by or affiliated with Anthropic.
 
 ## What it does
 
-- **On the prompt line.** A small cat at the end of the line above your prompt. It uses one row: the cat rises into the empty space above. A thought bubble shows what it wants (`><>` when hungry, `zZ` when sleepy, yarn when bored), and a tiny bowl shows its kibble.
+- **On the prompt line.** A small cat at the end of the line above your prompt, three rows tall (`/cat face` makes it one). A thought bubble shows what it wants (`><>` when hungry, `zZ` when sleepy, yarn when bored), and a tiny bowl shows its kibble.
 - **Reacts to your session.** Watches while Claude works, jumps when a tool call fails, and falls asleep after ten quiet minutes. Sending a prompt wakes it.
 - **Earns its food.** Each finished Claude reply adds one kibble, up to five.
 - **A room.** `/cat` opens it in a side pane: day or night window, stats, Feed, Play, Cuddle and Treat, and a diary.
@@ -35,7 +35,8 @@ Needs Claude Code 2.1.287 or later (the mods API) and a terminal with true colou
 | Type | What happens |
 | --- | --- |
 | `/cat` | Opens or closes the room. Esc also closes it. |
-| `/cat settings` | Size, where it sits, side, caption and coat. Tab moves, arrows choose, Enter sets. |
+| `/cat settings` | Size, side, caption and coat. Tab moves, arrows choose, Enter sets. |
+| `/cat big`, `/cat left`, `/cat smoke` | Sets one choice straight away. Any choice from the table below works, except `off` (`/cat caption off`). |
 | `/cat help` | A short guide. You can also ask Claude about the cat: the plugin ships a guide Claude reads when the cat comes up. |
 | `/cat feed`, `play`, `cuddle`, `treat` | Care for it without opening the room. Treats: three a day. |
 | `/cat name Biscuit` | Renames it. |
@@ -48,8 +49,7 @@ In the room, click it (or press `ctrl+x` then `tab`) to use the keys: `f` feed, 
 | Setting | Choices |
 | --- | --- |
 | Size | Small pixel cat (3 rows), big pixel cat (4 rows), line art, or a one-line face |
-| Where | One row, the cat rising into the space above; or rows of its own that cover nothing |
-| Side | Right or left (left always uses its own rows) |
+| Side | Right or left |
 | Caption | Name and mood, only news such as `+1 kibble`, or off |
 | Coat | Tabby, smoke, midnight, tuxedo, cream |
 

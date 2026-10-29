@@ -23,7 +23,7 @@ You cannot run `/cat` yourself. Tell the person exactly what to type.
 | `/cat name <name>` | Renames it, up to 12 characters. |
 | `/cat hide`, `/cat show` | Takes it off the prompt line, or brings it back. The room still works. |
 
-Settings can also be typed: `/cat size small|big|ascii|face`, `/cat where over|rows`, `/cat side right|left`, `/cat caption mood|news|off`, `/cat coat tabby|smoke|midnight|tuxedo|cream`.
+Settings can also be typed: `/cat size small|big|ascii|face`, `/cat side right|left`, `/cat caption mood|news|off`, `/cat coat tabby|smoke|midnight|tuxedo|cream`. A choice alone works too: `/cat big`, `/cat left`, `/cat smoke`. The one exception is `off`, which needs `/cat caption off`.
 
 ## The room
 
@@ -36,8 +36,7 @@ Settings can also be typed: `/cat size small|big|ascii|face`, `/cat where over|r
 | Setting | Choices |
 | --- | --- |
 | Size | Small pixel cat (3 rows), big pixel cat (4 rows), line art, or a one-line face |
-| Where | One row, with the cat rising into the empty space above; or rows of its own that cover nothing |
-| Side | Right or left. Left always uses its own rows. |
+| Side | Right or left |
 | Caption | Name and mood, only news such as `+1 kibble`, or off |
 | Coat | Tabby, smoke, midnight, tuxedo, cream |
 
@@ -52,7 +51,8 @@ Settings can also be typed: `/cat size small|big|ascii|face`, `/cat where over|r
 
 - **No cat above the prompt.** Try `/cat show`. The band above the prompt can be folded with its `[-]` mark; unfold it to see the cat again. While the room is open, the cat is in the room instead of on the prompt line. After installing or updating, run `/reload-plugins`.
 - **The room opens above the prompt, not at the side.** The side pane needs the fullscreen renderer, `/tui fullscreen`, and a window at least 110 columns wide.
-- **Only the bottom of the cat shows, or it covers the end of long output lines.** Run `/cat settings` and set Where to "Its own rows".
+- **Only the bottom of the cat shows.** Versions before 0.3.1 drew it rising above the prompt line, which Claude Code cuts off. Update the plugin and run `/reload-plugins`.
+- **The cat takes too much room.** `/cat face` is a one-row cat.
 - **No pixel cat at all in the desktop app or an IDE panel.** The drawings need Claude Code running in a terminal. The room's text and buttons still work there.
 - **Colours look wrong or blocky.** Use a terminal with true colour, such as Windows Terminal, iTerm2 or the VS Code terminal.
 - **"The bowl is empty."** Kibble comes only from finished Claude replies.

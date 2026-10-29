@@ -34,7 +34,7 @@ The parts of Claude Code's function-hook API that Claude Cat uses, with the decl
 ## Elements used
 
 - `Raster` (`RasterProps`): `key`, `columns`, `rows`, `cells`. Cells are padded base64 of little-endian u32 triplets `[codePoint, foreground, background]`; a colour is `0x00RRGGBB`, or `0x01000000` for the terminal default. Terminal only.
-- `Box` (`BoxProps`): flex layout, `width`, `height`, `gap`, and `position: "absolute"` with `top`/`left` in cells (negative `top` paints over the rows above without moving them).
+- `Box` (`BoxProps`): flex layout, `width`, `height`, `gap`, and `position: "absolute"` with `top`/`left` in cells. In the `AbovePrompt` band a negative `top` does not reach the rows above: the band clips its drawing to itself.
 - `Text` (`TextProps`): `color` takes a `ThemeKey` (`claude`, `success`, `warning`, `error`, `inactive`, ...) or a hex string. `dimColor`, `bold`, `wrap: 'truncate-end'`.
 - `Button` (`ButtonProps`): `key`, `label`, `hotkey` (one digit or lowercase letter), `plain` (draws `f: Feed` instead of `[ Feed ]`), `variant`, `onPress`. Hotkeys work while the site holds the keyboard: a click, or `ctrl+x` then `tab`.
 - `Select` (`SelectProps`): `key`, `label`, `options` (`SelectOption`: `value`, `label`), `value`, `autoFocus`, `onSelect`. Not on `mobile`.

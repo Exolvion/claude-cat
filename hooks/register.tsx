@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Caption, CatData, CatView, Coat, Look, Side, Spot } from '../types'
+import type { Caption, CatData, CatView, Coat, Look, Side } from '../types'
 import { COATS, encode } from './sprites'
 import {
   BAND_COLS, ROOM_COLS, ROOM_ROWS, asciiCat, bandLayer, bandRows, faceCat, moodWord, needOf, phrase, poseFor, roomLayer,
@@ -20,14 +20,13 @@ const FRAME_MS = 333
 const CARE: Care[] = ['feed', 'play', 'cuddle', 'treat']
 
 const LOOKS: Look[] = ['big', 'small', 'ascii', 'face']
-const SPOTS: Spot[] = ['over', 'rows']
 const SIDES: Side[] = ['right', 'left']
 const CAPTIONS: Caption[] = ['mood', 'news', 'off']
 
 const FRESH: CatData = {
   name: 'Mochi', coat: 'tabby', hunger: 75, mood: 80, energy: 80, bowl: 2, treats: 3,
   treatsDay: '', born: 0, savedAt: 0, hidden: false,
-  look: 'small', spot: 'over', side: 'right', caption: 'mood', log: [],
+  look: 'small', side: 'right', caption: 'mood', log: [],
 }
 const NO_VIEW: CatView = { kind: 'idle', note: '', flash: '', isRoomOpen: false }
 const catState = atom({ plugin: 'pixel-cat', key: 'cat' } as const, FRESH)
@@ -85,7 +84,6 @@ function sanitize(raw: unknown, now: number): CatData {
     hidden: s.hidden === true,
     // Older saves called the one-line face "tiny" and had a "style" in place of the caption.
     look: s.look === 'tiny' ? 'face' : pick(LOOKS, s.look, FRESH.look),
-    spot: pick(SPOTS, s.spot, FRESH.spot),
     side: pick(SIDES, s.side, FRESH.side),
     caption: s.caption === undefined && s.style === 'cat' ? 'off' : pick(CAPTIONS, s.caption, FRESH.caption),
     log,
@@ -226,20 +224,24 @@ async function toggleRoom($: Engine): Promise<string> {
 }
 
 async function openSettings($: Engine): Promise<string> {
-  await $.ui.open({ id: SETTINGS, title: 'Cat settings', focus: true, closeOnEscape: true, holdToasts: true, rows: 13, columns: 56 })
+  await $.ui.open({ id: SETTINGS, title: 'Cat settings', focus: true, closeOnEscape: true, holdToasts: true, rows: 12, columns: 56 })
   return `Opened ${live.cat.name}'s settings. Tab moves, arrows choose, Enter sets, Esc closes.`
 }
 
 /* ---------- settings ---------- */
 
-const CHOICES = { look: LOOKS, spot: SPOTS, side: SIDES, caption: CAPTIONS, coat: Object.keys(COATS) as Coat[] }
+const CHOICES = { look: LOOKS, side: SIDES, caption: CAPTIONS, coat: Object.keys(COATS) as Coat[] }
 type SettingKey = keyof typeof CHOICES
-const ALIASES: Record<string, SettingKey> = { size: 'look', look: 'look', spot: 'spot', where: 'spot', side: 'side', caption: 'caption', coat: 'coat' }
+const ALIASES: Record<string, SettingKey> = { size: 'look', look: 'look', side: 'side', caption: 'caption', coat: 'coat' }
+// A choice typed alone, as in /cat big or /cat smoke. Every choice names one
+// setting, except "off", which reads like hide, so it keeps /cat caption off.
+const SHORTCUTS: Record<string, SettingKey> = Object.fromEntries(
+  (Object.keys(CHOICES) as SettingKey[]).flatMap(key => CHOICES[key].filter(v => v !== 'off').map(v => [v, key])),
+)
 
 function withSetting(c: CatData, key: SettingKey, value: string): CatData {
   switch (key) {
     case 'look': return { ...c, look: value as Look }
-    case 'spot': return { ...c, spot: value as Spot }
     case 'side': return { ...c, side: value as Side }
     case 'caption': return { ...c, caption: value as Caption }
     case 'coat': return { ...c, coat: value as Coat }
@@ -259,7 +261,7 @@ async function setting($: Engine, key: SettingKey, value: string): Promise<strin
 
 // Keep in step with skills/cat-help/SKILL.md, the longer guide Claude reads.
 const HELP = 'Cat commands: /cat opens or closes the room, /cat settings, /cat feed, play, cuddle or treat, '
-  + '/cat name <name>, /cat hide or show. In the room, click it to use the keys f p c t s x. '
+  + '/cat name <name>, /cat hide or show. A choice alone sets it: /cat big, small, left, smoke. In the room, click it to use the keys f p c t s x. '
   + 'Each finished Claude reply adds a kibble. The room docks at the side under /tui fullscreen at 110+ columns.'
 
 async function runCommand($: Engine, args: string): Promise<string> {
@@ -272,6 +274,8 @@ async function runCommand($: Engine, args: string): Promise<string> {
   if (word === 'settings' || word === 'set') return openSettings($)
   const key = ALIASES[word]
   if (key) return setting($, key, (rest[0] ?? '').toLowerCase())
+  const choice = SHORTCUTS[word]
+  if (choice) return setting($, choice, word)
   if ((CARE as string[]).includes(word)) return care($, word as Care)
   if (word === 'name') {
     const name = rest.join(' ').trim().slice(0, 12)
@@ -356,7 +360,7 @@ export const register: Register = on => {
     await $.command.register({
       name: 'cat',
       description: 'Your pixel cat. Opens its room, or settings, feed, play, cuddle, treat, name, hide, show.',
-      argumentHint: '[help | settings | feed | play | cuddle | treat | close | name <name> | hide | show]',
+      argumentHint: '[help | settings | feed | play | cuddle | treat | close | name <name> | hide | show | big | small | left | ...]',
     })
     await load($)
     return next(e)
@@ -418,8 +422,8 @@ export const register: Register = on => {
   }).catch(($, e, next) => next(e))
 
   // The prompt line: the cat, a thought bubble when it wants something, its bowl,
-  // and a short caption. "over" keeps the band one row tall and lets the drawing
-  // rise into the empty space above it; "rows" gives the drawing rows of its own.
+  // and a short caption. The band is as tall as the drawing: the engine clips a
+  // drawing to the band, so one that rises above it shows only its feet.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const cat = await read($, catState)
     const view = await read($, viewState)
@@ -438,26 +442,22 @@ export const register: Register = on => {
     const ink = COATS[cat.coat].t
 
     let art
-    let width: number
     let rows: number
     if (pixel) {
       const cells = encode(bandLayer(p, live.frame, cat, need))
       live.lastBand = cells
       live.bandShown = true
       rows = bandRows(cat.look)
-      width = BAND_COLS
       art = <Raster key="cat" columns={BAND_COLS} rows={rows} cells={cells} />
     } else {
       live.bandShown = false
       if (cat.look === 'ascii') {
         const lines = asciiCat(p, need)
         rows = lines.length
-        width = Math.max(...lines.map(l => l.length)) + 1
         art = <Box flexDirection="column">{lines.map(l => <Text color={ink}>{l}</Text>)}</Box>
       } else {
         const face = faceCat(p, need)
         rows = 1
-        width = face.length + 1
         art = <Text color={ink}>{face}</Text>
       }
     }
@@ -471,32 +471,28 @@ export const register: Register = on => {
         </Text>
       )
 
-    // Over the transcript only on the right, where its lines leave room.
-    const over = cat.spot === 'over' && cat.side === 'right' && rows > 1
-    const seat = over ? (
-      <Box width={width} height={1}>
-        <Box position="absolute" top={-(rows - 1)} left={0}>{art}</Box>
-      </Box>
-    ) : art
-    const height = over ? 1 : rows
-    return cat.side === 'right' ? (
-      <Box flexDirection="row" justifyContent="flex-end" alignItems="flex-end" height={height} gap={1}>
+    const line = cat.side === 'right' ? (
+      <Box flexDirection="row" justifyContent="flex-end" alignItems="flex-end" height={rows} gap={1}>
         {caption}
-        {seat}
+        {art}
       </Box>
     ) : (
-      <Box flexDirection="row" alignItems="flex-end" height={height} gap={1}>
-        {seat}
+      <Box flexDirection="row" alignItems="flex-end" height={rows} gap={1}>
+        {art}
         {caption}
       </Box>
     )
+    // Other mods may draw in this band too: theirs go above the cat, which keeps
+    // its place next to the prompt.
+    const below = await next(e)
+    return below ? <Box flexDirection="column">{below}{line}</Box> : line
   })
 
   on('ui.render', { component: 'Pane', requestId: SETTINGS }, async ($, e) => {
     const cat = await read($, catState)
     if (e.surface === 'mobile') {
       const { Text } = $.ui.resolve(e)
-      return <Text>Change these with /cat size, /cat where, /cat side, /cat caption and /cat coat.</Text>
+      return <Text>Change these with /cat size, /cat side, /cat caption and /cat coat.</Text>
     }
     const { Box, Select, Text } = $.ui.resolve(e)
     const save = (key: SettingKey) => (value: string) => { void setting($, key, value) }
@@ -511,13 +507,9 @@ export const register: Register = on => {
           { value: 'ascii', label: 'Line art, 3 rows' },
           { value: 'face', label: 'One-line face' },
         ]} />
-        <Select key="spot" label="Where     " value={cat.spot} onSelect={save('spot')} options={[
-          { value: 'over', label: 'One row, cat rises into the space above' },
-          { value: 'rows', label: 'Its own rows, covers nothing' },
-        ]} />
         <Select key="side" label="Side      " value={cat.side} onSelect={save('side')} options={[
           { value: 'right', label: 'Right' },
-          { value: 'left', label: 'Left (always its own rows)' },
+          { value: 'left', label: 'Left' },
         ]} />
         <Select key="caption" label="Caption   " value={cat.caption} onSelect={save('caption')} options={[
           { value: 'mood', label: 'Name and mood' },

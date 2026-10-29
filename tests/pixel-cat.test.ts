@@ -81,14 +81,15 @@ test('commands rename, recolour and hide the cat', async ($, on) => {
   expect((await run($, 'help')).text).toMatch(/^Cat commands: \/cat opens or closes the room/)
 })
 
-test('by default the band is a big cat in four rows, with its bowl, a one-word caption and a menu button', async ($, on) => {
+test('by default the band is a big cat in four rows, with its bowl, its name over a one-word mood, the name opening the room', async ($, on) => {
   ground(on)
   await start($)
   const ui = await $.ui.mount({ plugin: 'pixel-cat', surface: 'terminal', ...BAND })
   const raster = await ui.find({ type: 'Raster', key: 'cat' })
   expect(raster?.props.columns).toBe(26)
   expect(raster?.props.rows).toBe(4)
-  expect((await ui.find({ type: 'Text', text: /Mochi/ }))?.text).toMatch(/Mochi · loafing/)
+  expect((await ui.find({ type: 'Text', text: 'Mochi' }))).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'loafing' })).toBeDefined()
   const root = catLine(await ui.drawn())
   expect(root.props.height).toBe(4)
   expect(await ui.find({ type: 'Button', key: 'menu' })).toBeDefined()

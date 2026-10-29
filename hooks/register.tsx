@@ -261,7 +261,7 @@ async function setting($: Engine, key: SettingKey, value: string): Promise<strin
 
 // Keep in step with skills/cat-help/SKILL.md, the longer guide Claude reads.
 const HELP = 'Cat commands: /cat opens or closes the room, /cat settings, /cat feed, play, cuddle or treat, '
-  + '/cat name <name>, /cat hide or show. The menu button on the prompt line opens the room. A choice alone sets it: /cat big, small, left, smoke. In the room, click it to use the keys f p c t s x. '
+  + '/cat name <name>, /cat hide or show. Clicking its name on the prompt line opens the room. A choice alone sets it: /cat big, small, left, smoke. In the room, click it to use the keys f p c t s x. '
   + 'Each finished Claude reply adds a kibble. The room docks at the side under /tui fullscreen at 110+ columns.'
 
 async function runCommand($: Engine, args: string): Promise<string> {
@@ -463,19 +463,17 @@ export const register: Register = on => {
     }
 
     const words = view.flash || (cat.caption === 'mood' ? moodWord(p.kind, need) : '')
-    const caption =
-      cat.caption === 'off' || !words ? null : (
-        <Text wrap="truncate-end">
+    // The name on top, the mood or news under it. The name opens the room, the same as /cat.
+    const caption = cat.caption === 'off' ? null : (
+      <Box flexDirection="column" alignItems={cat.side === 'right' ? 'flex-end' : 'flex-start'}>
+        <Button key="menu" plain label={`Open ${cat.name}'s room`} onPress={() => { void toggleRoom($) }}>
           <Text color={ink} bold>{cat.name}</Text>
-          {view.flash ? <Text color="claude">{` ${view.flash}`}</Text> : <Text dimColor>{` · ${words}`}</Text>}
-        </Text>
-      )
-
-    // Opens the room, the same as /cat.
-    const menu = <Button key="menu" plain label="menu" onPress={() => { void toggleRoom($) }} />
+        </Button>
+        {words ? <Text wrap="truncate-end" {...(view.flash ? { color: 'claude' } : { dimColor: true })}>{words}</Text> : null}
+      </Box>
+    )
     const line = cat.side === 'right' ? (
       <Box flexDirection="row" justifyContent="flex-end" alignItems="flex-end" height={rows} gap={1}>
-        {menu}
         {caption}
         {art}
       </Box>
@@ -483,7 +481,6 @@ export const register: Register = on => {
       <Box flexDirection="row" alignItems="flex-end" height={rows} gap={1}>
         {art}
         {caption}
-        {menu}
       </Box>
     )
     // Other mods may draw in this band too: theirs go above the cat, which keeps

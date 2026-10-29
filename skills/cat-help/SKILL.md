@@ -13,7 +13,7 @@ You cannot run `/cat` yourself. Tell the person exactly what to type.
 
 | Type | What it does |
 | --- | --- |
-| `/cat` | Opens or closes the room. Esc also closes it. |
+| `/cat` | Opens or closes the room. Esc also closes it. The **menu** button on the prompt line opens it too. |
 | `/cat settings` | Opens the settings window. |
 | `/cat help` | Prints a short guide. |
 | `/cat feed` | Eats one kibble from the bowl. Each finished Claude reply adds one, up to five. |
@@ -35,7 +35,7 @@ Settings can also be typed: `/cat size small|big|ascii|face`, `/cat side right|l
 
 | Setting | Choices |
 | --- | --- |
-| Size | Small pixel cat (3 rows), big pixel cat (4 rows), line art, or a one-line face |
+| Size | Big pixel cat (4 rows, the default), small pixel cat (3 rows), line art, or a one-line face |
 | Side | Right or left |
 | Caption | Name and mood, only news such as `+1 kibble`, or off |
 | Coat | Tabby, smoke, midnight, tuxedo, cream |

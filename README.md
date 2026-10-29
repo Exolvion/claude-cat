@@ -8,7 +8,7 @@ Unofficial. A community mod, not made by or affiliated with Anthropic.
 
 ## What it does
 
-- **On the prompt line.** A small cat at the end of the line above your prompt, three rows tall (`/cat face` makes it one). A thought bubble shows what it wants (`><>` when hungry, `zZ` when sleepy, yarn when bored), and a tiny bowl shows its kibble.
+- **On the prompt line.** A pixel cat at the end of the line above your prompt, four rows tall (`/cat small` makes it three, `/cat face` one). Its **menu** button opens the room. A thought bubble shows what it wants (`><>` when hungry, `zZ` when sleepy, yarn when bored), and a tiny bowl shows its kibble.
 - **Reacts to your session.** Watches while Claude works, jumps when a tool call fails, and falls asleep after ten quiet minutes. Sending a prompt wakes it.
 - **Earns its food.** Each finished Claude reply adds one kibble, up to five.
 - **A room.** `/cat` opens it in a side pane: day or night window, stats, Feed, Play, Cuddle and Treat, and a diary.
@@ -48,7 +48,7 @@ In the room, click it (or press `ctrl+x` then `tab`) to use the keys: `f` feed, 
 
 | Setting | Choices |
 | --- | --- |
-| Size | Small pixel cat (3 rows), big pixel cat (4 rows), line art, or a one-line face |
+| Size | Big pixel cat (4 rows, the default), small pixel cat (3 rows), line art, or a one-line face |
 | Side | Right or left |
 | Caption | Name and mood, only news such as `+1 kibble`, or off |
 | Coat | Tabby, smoke, midnight, tuxedo, cream |

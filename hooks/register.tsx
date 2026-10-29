@@ -26,7 +26,7 @@ const CAPTIONS: Caption[] = ['mood', 'news', 'off']
 const FRESH: CatData = {
   name: 'Mochi', coat: 'tabby', hunger: 75, mood: 80, energy: 80, bowl: 2, treats: 3,
   treatsDay: '', born: 0, savedAt: 0, hidden: false,
-  look: 'small', side: 'right', caption: 'mood', log: [],
+  look: 'big', side: 'right', caption: 'mood', log: [],
 }
 const NO_VIEW: CatView = { kind: 'idle', note: '', flash: '', isRoomOpen: false }
 const catState = atom({ plugin: 'pixel-cat', key: 'cat' } as const, FRESH)
@@ -261,7 +261,7 @@ async function setting($: Engine, key: SettingKey, value: string): Promise<strin
 
 // Keep in step with skills/cat-help/SKILL.md, the longer guide Claude reads.
 const HELP = 'Cat commands: /cat opens or closes the room, /cat settings, /cat feed, play, cuddle or treat, '
-  + '/cat name <name>, /cat hide or show. A choice alone sets it: /cat big, small, left, smoke. In the room, click it to use the keys f p c t s x. '
+  + '/cat name <name>, /cat hide or show. The menu button on the prompt line opens the room. A choice alone sets it: /cat big, small, left, smoke. In the room, click it to use the keys f p c t s x. '
   + 'Each finished Claude reply adds a kibble. The room docks at the side under /tui fullscreen at 110+ columns.'
 
 async function runCommand($: Engine, args: string): Promise<string> {
@@ -434,7 +434,7 @@ export const register: Register = on => {
     live.cat = cat
     startTimers($)
     live.bandId = e.requestId
-    const { Box, Raster, Text } = $.ui.resolve(e)
+    const { Box, Button, Raster, Text } = $.ui.resolve(e)
     const pixel = cat.look === 'big' || cat.look === 'small'
     // The text looks redraw only when the mood changes, so they hold still between.
     const p = pixel ? currentPose() : currentPose(Date.now(), 1)
@@ -471,8 +471,11 @@ export const register: Register = on => {
         </Text>
       )
 
+    // Opens the room, the same as /cat.
+    const menu = <Button key="menu" plain label="menu" onPress={() => { void toggleRoom($) }} />
     const line = cat.side === 'right' ? (
       <Box flexDirection="row" justifyContent="flex-end" alignItems="flex-end" height={rows} gap={1}>
+        {menu}
         {caption}
         {art}
       </Box>
@@ -480,6 +483,7 @@ export const register: Register = on => {
       <Box flexDirection="row" alignItems="flex-end" height={rows} gap={1}>
         {art}
         {caption}
+        {menu}
       </Box>
     )
     // Other mods may draw in this band too: theirs go above the cat, which keeps
@@ -502,8 +506,8 @@ export const register: Register = on => {
         <Text dimColor>Changes show on the prompt line straight away.</Text>
         <Text> </Text>
         <Select key="look" label="Size      " value={cat.look} autoFocus onSelect={save('look')} options={[
-          { value: 'small', label: 'Small pixel cat, 3 rows' },
           { value: 'big', label: 'Big pixel cat, 4 rows' },
+          { value: 'small', label: 'Small pixel cat, 3 rows' },
           { value: 'ascii', label: 'Line art, 3 rows' },
           { value: 'face', label: 'One-line face' },
         ]} />

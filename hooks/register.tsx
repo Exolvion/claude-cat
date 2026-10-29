@@ -261,7 +261,7 @@ async function setting($: Engine, key: SettingKey, value: string): Promise<strin
 
 // Keep in step with skills/cat-help/SKILL.md, the longer guide Claude reads.
 const HELP = 'Cat commands: /cat opens or closes the room, /cat settings, /cat feed, play, cuddle or treat, '
-  + '/cat name <name>, /cat hide or show. Clicking its name on the prompt line opens the room. A choice alone sets it: /cat big, small, left, smoke. In the room, click it to use the keys f p c t s x. '
+  + '/cat name <name>, /cat hide or show. Its name or the ≡ beside it opens the room. A choice alone sets it: /cat big, small, left, smoke. In the room, click it to use the keys f p c t s x. '
   + 'Each finished Claude reply adds a kibble. The room docks at the side under /tui fullscreen at 110+ columns.'
 
 async function runCommand($: Engine, args: string): Promise<string> {
@@ -466,9 +466,12 @@ export const register: Register = on => {
     // The name on top, the mood or news under it. The name opens the room, the same as /cat.
     const caption = cat.caption === 'off' ? null : (
       <Box flexDirection="column" alignItems={cat.side === 'right' ? 'flex-end' : 'flex-start'}>
-        <Button key="menu" plain label={`Open ${cat.name}'s room`} onPress={() => { void toggleRoom($) }}>
-          <Text color={ink} bold>{cat.name}</Text>
-        </Button>
+        <Box flexDirection="row" gap={1}>
+          <Button key="name" plain label={`Open ${cat.name}'s room`} onPress={() => { void toggleRoom($) }}>
+            <Text color={ink} bold>{cat.name}</Text>
+          </Button>
+          <Button key="menu" plain dimColor label="≡" onPress={() => { void toggleRoom($) }} />
+        </Box>
         {words ? <Text wrap="truncate-end" {...(view.flash ? { color: 'claude' } : { dimColor: true })}>{words}</Text> : null}
       </Box>
     )

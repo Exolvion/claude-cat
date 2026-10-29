@@ -81,7 +81,7 @@ test('commands rename, recolour and hide the cat', async ($, on) => {
   expect((await run($, 'help')).text).toMatch(/^Cat commands: \/cat opens or closes the room/)
 })
 
-test('by default the band is a big cat in four rows, with its bowl, its name over a one-word mood, the name opening the room', async ($, on) => {
+test('by default the band is a big cat in four rows, with its bowl, its name and menu button over a one-word mood', async ($, on) => {
   ground(on)
   await start($)
   const ui = await $.ui.mount({ plugin: 'pixel-cat', surface: 'terminal', ...BAND })

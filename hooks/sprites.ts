@@ -77,6 +77,20 @@ const SMALL_TAILS: Record<Tail, Dot[]> = {
   puff: [[9, 6, 'o'], [9, 5, 'f'], [10, 5, 'o'], [9, 4, 's'], [10, 4, 'o'], [9, 3, 'f'], [10, 3, 'o'], [9, 2, 's'], [10, 2, 'o'], [9, 1, 'o'], [8, 7, 'o']],
 }
 
+/* Sitting cats: the small cat's head on a body, 13 wide, 10 or 12 tall: the
+   prompt line in five or six rows. The tail curls up beside the body. */
+const SIT_BODY = {
+  sit: { head: 6, rows: ['offfllfffo', 'offfssfffo', 'offlfflffo', '.oooooooooo'] },
+  tall: { head: 7, rows: ['offffffffo', 'offfssfffo', 'offffffffo', 'offlfflffo', '.oooooooooo'] },
+}
+// Rows counted up from the bottom one (0).
+const SIT_TAILS: Record<Tail, Dot[]> = {
+  up: [[11, -3, 'o'], [11, -2, 'f'], [10, -1, 'o'], [11, -1, 'f'], [10, 0, 'o']],
+  flick: [[12, -3, 'o'], [11, -2, 'o'], [12, -2, 'f'], [10, -1, 'o'], [11, -1, 'f'], [10, 0, 'o']],
+  low: [[10, 0, 'o'], [11, -1, 'o'], [12, -1, 'o'], [11, 0, 'f'], [12, 0, 's'], [13, 0, 'o']],
+  puff: [[11, -4, 'o'], [12, -4, 'o'], [11, -3, 'f'], [12, -3, 's'], [11, -2, 's'], [12, -2, 'f'], [10, -1, 'o'], [11, -1, 'f'], [12, -1, 'o'], [10, 0, 'o']],
+}
+
 /* Mini cat, 13 wide, 6 tall: the prompt line in three rows. No outline, bigger eyes. */
 const MINI_BASE = ['.f......f.', 'fpf....fpf', 'ffffssffff', 'ffffffffff', 'fbffnnffbf', '.ffllllff.']
 const MINI_EYES: Record<Exclude<Eyes, 'open'>, Dot[]> = {
@@ -155,6 +169,17 @@ export function drawSmall(L: Layer, x: number, y: number, coat: Coat, p: CatPose
   const pal = COATS[coat]
   draw(L, SMALL_BASE, x, y, pal)
   dots(L, SMALL_TAILS[p.tail], x, y, pal)
+  const look = p.look ?? 0
+  if (p.eyes === 'open') dots(L, [[2 + look, 3, 'e'], [2 + look, 4, 'e'], [7 + look, 3, 'e'], [7 + look, 4, 'e']], x, y, pal)
+  else dots(L, SMALL_EYES[p.eyes], x, y, pal)
+}
+
+export function drawSitting(L: Layer, x: number, y: number, coat: Coat, p: CatPose, size: 'sit' | 'tall'): void {
+  const pal = COATS[coat]
+  const body = SIT_BODY[size]
+  draw(L, [...SMALL_BASE.slice(0, body.head), ...body.rows], x, y, pal)
+  const bottom = y + body.head + body.rows.length - 1
+  for (const [dx, dy, k] of SIT_TAILS[p.tail]) setPx(L, x + dx, bottom + dy, pal[k])
   const look = p.look ?? 0
   if (p.eyes === 'open') dots(L, [[2 + look, 3, 'e'], [2 + look, 4, 'e'], [7 + look, 3, 'e'], [7 + look, 4, 'e']], x, y, pal)
   else dots(L, SMALL_EYES[p.eyes], x, y, pal)

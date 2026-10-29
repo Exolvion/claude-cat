@@ -19,7 +19,7 @@ const SLEEP_AFTER = 10 * MIN
 const FRAME_MS = 333
 const CARE: Care[] = ['feed', 'play', 'cuddle', 'treat']
 
-const LOOKS: Look[] = ['big', 'small', 'ascii', 'face']
+const LOOKS: Look[] = ['big', 'sit', 'tall', 'small', 'ascii', 'face']
 const SIDES: Side[] = ['right', 'left']
 const CAPTIONS: Caption[] = ['mood', 'news', 'off']
 
@@ -224,7 +224,7 @@ async function toggleRoom($: Engine): Promise<string> {
 }
 
 async function openSettings($: Engine): Promise<string> {
-  await $.ui.open({ id: SETTINGS, title: 'Cat settings', focus: true, closeOnEscape: true, holdToasts: true, rows: 12, columns: 56 })
+  await $.ui.open({ id: SETTINGS, title: 'Cat settings', focus: true, closeOnEscape: true, holdToasts: true, rows: 14, columns: 56 })
   return `Opened ${live.cat.name}'s settings. Tab moves, arrows choose, Enter sets, Esc closes.`
 }
 
@@ -435,7 +435,7 @@ export const register: Register = on => {
     startTimers($)
     live.bandId = e.requestId
     const { Box, Button, Raster, Text } = $.ui.resolve(e)
-    const pixel = cat.look === 'big' || cat.look === 'small'
+    const pixel = cat.look !== 'ascii' && cat.look !== 'face'
     // The text looks redraw only when the mood changes, so they hold still between.
     const p = pixel ? currentPose() : currentPose(Date.now(), 1)
     const need = needOf(cat, p.kind)
@@ -507,6 +507,8 @@ export const register: Register = on => {
         <Text> </Text>
         <Select key="look" label="Size      " value={cat.look} autoFocus onSelect={save('look')} options={[
           { value: 'big', label: 'Big pixel cat, 4 rows' },
+          { value: 'sit', label: 'Sitting cat, 5 rows' },
+          { value: 'tall', label: 'Sitting cat, 6 rows' },
           { value: 'small', label: 'Small pixel cat, 3 rows' },
           { value: 'ascii', label: 'Line art, 3 rows' },
           { value: 'face', label: 'One-line face' },

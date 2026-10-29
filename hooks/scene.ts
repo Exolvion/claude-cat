@@ -3,7 +3,7 @@
 // so the drawings can be rendered and checked on their own.
 
 import type { CatData, Look } from '../types'
-import { FISH, HEART, HEART_S, YARN, YARN_S, bowl, draw, drawBig, drawMini, drawSmall, glyph, layer, setPx } from './sprites'
+import { FISH, HEART, HEART_S, YARN, YARN_S, bowl, draw, drawBig, drawMini, drawSitting, drawSmall, glyph, layer, setPx } from './sprites'
 import type { CatPose, Layer } from './sprites'
 
 export type Act = 'eating' | 'treat' | 'purring' | 'playing' | 'startled' | 'swat'
@@ -162,7 +162,7 @@ export function roomLayer(p: Pose, f: number, cat: CatData, night = isNight()): 
 // Left to right with the cat on the right side: thought bubble, cat, bowl.
 // On the left side the order flips, so the bubble stays on the open side.
 export const BAND_COLS = 26
-export const bandRows = (look: Look): number => (look === 'big' ? 4 : 3)
+export const bandRows = (look: Look): number => ({ big: 4, sit: 5, tall: 6 } as Partial<Record<Look, number>>)[look] ?? 3
 
 const BUBBLE = ['.VVVVV.', 'VWWWWWV', 'VWWWWWV', 'VWWWWWV', '.VVVVV.']
 const BUBBLE_INK = { V: '#9aa0b5', W: '#f7f7fb', F: '#2f6fd6' }
@@ -181,8 +181,9 @@ export function bandLayer(p: Pose, f: number, cat: CatData, need: Need): Layer {
   const bubbleX = right ? 0 : 19
   const catX = right ? 7 : 6
   const bowlX = right ? 21 : 0
-  const drawCat = cat.look === 'big' ? drawSmall : drawMini
-  drawCat(L, catX + (p.shake ?? 0), 0, cat.coat, p)
+  const x = catX + (p.shake ?? 0)
+  if (cat.look === 'sit' || cat.look === 'tall') drawSitting(L, x, 0, cat.coat, p, cat.look)
+  else (cat.look === 'big' ? drawSmall : drawMini)(L, x, 0, cat.coat, p)
   draw(L, miniBowl(cat.bowl), bowlX, H - 3)
   if (need) {
     draw(L, BUBBLE, bubbleX, 0, BUBBLE_INK)

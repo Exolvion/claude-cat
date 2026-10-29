@@ -23,7 +23,7 @@ You cannot run `/cat` yourself. Tell the person exactly what to type.
 | `/cat name <name>` | Renames it, up to 12 characters. |
 | `/cat hide`, `/cat show` | Takes it off the prompt line, or brings it back. The room still works. |
 
-Settings can also be typed: `/cat size small|big|ascii|face`, `/cat side right|left`, `/cat caption mood|news|off`, `/cat coat tabby|smoke|midnight|tuxedo|cream`. A choice alone works too: `/cat big`, `/cat left`, `/cat smoke`. The one exception is `off`, which needs `/cat caption off`.
+Settings can also be typed: `/cat size big|sit|tall|small|ascii|face`, `/cat side right|left`, `/cat caption mood|news|off`, `/cat coat tabby|smoke|midnight|tuxedo|cream`. A choice alone works too: `/cat big`, `/cat left`, `/cat smoke`. The one exception is `off`, which needs `/cat caption off`.
 
 ## The room
 
@@ -35,7 +35,7 @@ Settings can also be typed: `/cat size small|big|ascii|face`, `/cat side right|l
 
 | Setting | Choices |
 | --- | --- |
-| Size | Big pixel cat (4 rows, the default), small pixel cat (3 rows), line art, or a one-line face |
+| Size | Big pixel cat (4 rows, the default), sitting cat (5 or 6 rows, head and body), small pixel cat (3 rows), line art, or a one-line face |
 | Side | Right or left |
 | Caption | Name and mood, only news such as `+1 kibble`, or off |
 | Coat | Tabby, smoke, midnight, tuxedo, cream |

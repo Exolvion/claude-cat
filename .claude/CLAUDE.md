@@ -16,7 +16,7 @@ A Claude Code mod (a plugin of function hooks) that draws a pixel cat on the lin
 | `skills/cat-help/SKILL.md` | Usage guide that ships with the plugin. In installed sessions Claude reads it when someone asks about the cat. Keep it in step with the commands, the settings and `HELP` in `register.tsx`. |
 | `tests/pixel-cat.test.ts` | Engine tests, run by `claude plugin test .`. |
 | `tools/typecheck.mjs` | Type check against Claude Code's API declarations. |
-| `tools/render.mjs` | Renders the drawings to PNG in `tools/out/` for checking art. `--docs` refreshes `docs/images/`. |
+| `tools/render.mjs` | Renders the drawings to PNG in `tools/out/` for checking art (`sitting.png` holds the sitting cats). `--docs` refreshes `docs/images/`. |
 | `.claude/CLAUDE.md` | This file. Claude Code reads it as project context when you work in the repo. |
 | `docs/mod-api-notes.md` | The API facts this mod relies on, with type names to grep. |
 
@@ -26,7 +26,7 @@ A Claude Code mod (a plugin of function hooks) that draws a pixel cat on the lin
 - **Time.** `decay()` applies real elapsed time on load and once a minute: a full belly lasts about a day, energy drains while awake and refills while asleep or while Claude Code is closed.
 - **Events.** `turn.start` and `turn.complete` make the cat watch, and a main-agent reply (no `agentId`, not aborted) adds a kibble. A `tool.call` result with `isError` startles it. `prompt.submit` wakes it. Ten minutes with no prompt puts it to sleep.
 - **Drawing.** `scene.ts` builds a pixel `Layer`. `encode()` packs it into a `Raster`'s cells: one cell is two pixels (the upper half block, foreground on top, background below), and an empty pixel is the terminal's default colour, so the cat works on light and dark themes. `tick()` runs every 333 ms, re-encodes, and calls `$.ui.blit` only when the cells changed. Render hooks redraw whenever the state they read changes.
-- **Prompt line** (the `AbovePrompt` band). Settings: `look` (big by default, small, ascii, face), `side` (right, left), `caption` (mood, news, off), `coat`. The band is as tall as the drawing, and its plain **menu** button opens the room. Any choice typed alone (`/cat big`) sets it, except `off`. A thought bubble shows a need (hungry `><>`, sleepy `zZ`, bored yarn); a mini bowl shows one pixel per kibble.
+- **Prompt line** (the `AbovePrompt` band). Settings: `look` (big by default, sit and tall for the 5- and 6-row sitting cats, small, ascii, face), `side` (right, left), `caption` (mood, news, off), `coat`. The band is as tall as the drawing, and its plain **menu** button opens the room. Any choice typed alone (`/cat big`) sets it, except `off`. A thought bubble shows a need (hungry `><>`, sleepy `zZ`, bored yarn); a mini bowl shows one pixel per kibble.
 - **Room.** Pane `cat-room`: docks beside the transcript under `/tui fullscreen` at 110+ columns, otherwise opens above the prompt. Feed, Play, Cuddle, Treat, Settings and Close buttons with hotkeys f, p, c, t, s, x.
 - **Settings.** Pane `cat-settings`, opened with `focus` and `closeOnEscape`, one `Select` per setting. Each pick saves at once.
 

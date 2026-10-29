@@ -3,7 +3,7 @@ export type Coat = 'tabby' | 'smoke' | 'midnight' | 'tuxedo' | 'cream'
 export type DiaryEntry = { t: number; text: string }
 
 /** How the prompt-line cat is drawn: big or small pixels, line art, or a one-line face. */
-export type Look = 'big' | 'small' | 'ascii' | 'face'
+export type Look = 'big' | 'sit' | 'tall' | 'small' | 'ascii' | 'face'
 /** Which end of the line it sits at. */
 export type Side = 'right' | 'left'
 /** The words beside it: its name and mood, only news such as "+1 kibble", or nothing. */

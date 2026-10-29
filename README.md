@@ -48,7 +48,7 @@ In the room, click it (or press `ctrl+x` then `tab`) to use the keys: `f` feed, 
 
 | Setting | Choices |
 | --- | --- |
-| Size | Big pixel cat (4 rows, the default), small pixel cat (3 rows), line art, or a one-line face |
+| Size | Big pixel cat (4 rows, the default), sitting cat (5 or 6 rows, head and body), small pixel cat (3 rows), line art, or a one-line face |
 | Side | Right or left |
 | Caption | Name and mood, only news such as `+1 kibble`, or off |
 | Coat | Tabby, smoke, midnight, tuxedo, cream |

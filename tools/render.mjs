@@ -120,6 +120,22 @@ for (const look of ['small', 'big']) {
 }
 sheet(band, 7, 'band.png')
 
+// The sitting cats: the same states, plus watching and startled for the other tails.
+const sitting = []
+for (const look of ['sit', 'tall']) {
+  for (const bg of [DARK, LIGHT]) {
+    for (const [kind, patch] of [...states, ['watching', {}], ['startled', {}]]) {
+      const c = cat({ ...patch, look })
+      const f = kind === 'asleep' ? 6 : 2
+      const p = S.poseFor(kind, f, 500)
+      const grid = cells(S.bandLayer(p, f, c, S.needOf(c, kind)))
+      while (grid.length < 6) grid.unshift(grid[0].map(() => ({ ch: ' ', fg: null, bg: null })))
+      sitting.push({ cells: grid, bg })
+    }
+  }
+}
+sheet(sitting, 9, 'sitting.png')
+
 // Every coat, in the room pose and on the prompt line.
 const coats = []
 for (const coat of Object.keys(P.COATS)) {

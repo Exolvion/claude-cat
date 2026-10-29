@@ -139,7 +139,7 @@ test('the old typed settings still work', async ($, on) => {
   await start($)
   expect((await run($, 'size big')).text).toBe('Size set to big.')
   expect((await run($, 'side left')).text).toBe('Side set to left.')
-  expect((await run($, 'size huge')).text).toBe('Size: big, small, ascii, face. It is big now. /cat settings opens a picker.')
+  expect((await run($, 'size huge')).text).toBe('Size: big, sit, tall, small, ascii, face. It is big now. /cat settings opens a picker.')
 })
 
 test('a save from before the redesign keeps its choices', async ($, on) => {
@@ -204,4 +204,16 @@ test('the cat leaves room in the band for what other mods draw there', async ($,
   expect(await ui.find({ type: 'Text', text: 'another mod' })).toBeDefined()
   expect(await ui.find({ type: 'Raster', key: 'cat' })).toBeDefined()
   await ui.unmount()
+})
+
+test('the sitting cats take five and six rows, with the tail beside the body', async ($, on) => {
+  ground(on)
+  await start($)
+  for (const [look, rows] of [['sit', 5], ['tall', 6]] as const) {
+    await run($, look)
+    const ui = await $.ui.mount({ plugin: 'pixel-cat', surface: 'terminal', ...BAND })
+    expect((await ui.find({ type: 'Raster', key: 'cat' }))?.props.rows).toBe(rows)
+    expect(catLine(await ui.drawn()).props.height).toBe(rows)
+    await ui.unmount()
+  }
 })

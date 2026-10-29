@@ -421,6 +421,16 @@ export const register: Register = on => {
     return next(e)
   }).catch(($, e, next) => next(e))
 
+  // Buttons that open a pane are answered here, not in their onPress: this $ carries
+  // the press, so the engine places the pane at any width as one the person asked
+  // for. Opened from a drawing's $, it counted as unasked and waited undrawn below
+  // 144 columns.
+  on('ui.press', { plugin: 'pixel-cat' }, async ($, e, next) => {
+    if (e.element === 'menu' || e.element === 'name') await toggleRoom($)
+    else if (e.element === 'settings') await openSettings($)
+    else return next(e)
+    return { element: e.element }
+  })
   // The prompt line: the cat, a thought bubble when it wants something, its bowl,
   // and a short caption. The band is as tall as the drawing: the engine clips a
   // drawing to the band, so one that rises above it shows only its feet.
@@ -466,7 +476,7 @@ export const register: Register = on => {
     // The name on top, the mood or news under it. The name opens the room, the same as /cat.
     const caption = cat.caption === 'off' ? null : (
       <Box flexDirection="column" alignItems={cat.side === 'right' ? 'flex-end' : 'flex-start'}>
-        <Button key="name" plain label={`Open ${cat.name}'s room`} onPress={() => { void toggleRoom($) }}>
+        <Button key="name" plain label={`Open ${cat.name}'s room`} onPress={() => {}}>
           <Text color={ink} bold>{cat.name}</Text>
         </Button>
         {words ? <Text wrap="truncate-end" {...(view.flash ? { color: 'claude' } : { dimColor: true })}>{words}</Text> : null}
@@ -483,18 +493,19 @@ export const register: Register = on => {
         {caption}
       </Box>
     )
-    // The menu sits in the top right corner, beside the engine's [-]. Mouse clicks
-    // reach it only under /tui fullscreen; elsewhere /cat opens the room.
-    const line = (
-      <Box flexDirection="row" height={rows} gap={1}>
-        {seat}
-        <Button key="menu" plain dimColor label="≡" onPress={() => { void toggleRoom($) }} />
-      </Box>
-    )
+    const line = <Box flexDirection="row" flexGrow={1} height={rows}>{seat}</Box>
     // Other mods may draw in this band too: theirs go above the cat, which keeps
     // its place next to the prompt.
     const below = await next(e)
-    return below ? <Box flexDirection="column">{below}{line}</Box> : line
+    const stack = below ? <Box flexDirection="column" flexGrow={1}>{below}{line}</Box> : line
+    // The menu sits beside the whole stack, on the band's first row next to the
+    // engine's [-]. Mouse clicks reach it only under /tui fullscreen.
+    return (
+      <Box flexDirection="row" gap={1}>
+        {stack}
+        <Button key="menu" plain dimColor label="≡" onPress={() => {}} />
+      </Box>
+    )
   })
 
   on('ui.render', { component: 'Pane', requestId: SETTINGS }, async ($, e) => {
@@ -580,7 +591,7 @@ export const register: Register = on => {
       </Box>,
       <Box flexDirection="row" justifyContent="space-between">
         <Text dimColor>{`${cat.treats} treats left today`}</Text>
-        <Button key="settings" hotkey="s" plain label="Settings" onPress={() => { void openSettings($) }} />
+        <Button key="settings" hotkey="s" plain label="Settings" onPress={() => {}} />
       </Box>,
     ]
     const diary = cat.log.slice(0, dock ? 5 : 2).map(d => (

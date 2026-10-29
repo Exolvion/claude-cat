@@ -56,6 +56,7 @@ A Claude Code mod (a plugin of function hooks) that draws a pixel cat on the lin
 - Headless checks (`claude -p "/cat ..."`) run against the real installed cat and save to its store. `/cat size check` is a harmless probe; avoid feed, play and the like. In Git Bash, prefix with `MSYS_NO_PATHCONV=1`, or `/cat` turns into a Windows path.
 - A `command.run` answer's `text` is also read by the model, so keep it short.
 - The band clips its drawing to itself. An absolute `Box` with a negative `top` (the old `spot: 'over'`, a one-row band with the cat rising above it) showed only the cat's bottom row, seen on Windows Terminal with 2.1.296, before and after limiting it to fullscreen. So the band is always as tall as the drawing. Do not bring `over` back; old saves that still hold `spot` are ignored.
+- A Button that opens a pane is answered in the `ui.press` hook, never its `onPress`. Only that hook's `$` carries the press, so the engine treats the open as asked and places it at any width. Opened through a render hook's captured `$`, the room counted as unasked: it waited undrawn below 144 columns while `/cat` reported it open.
 - The band is shared. Any other mod that draws in `AbovePrompt` runs after the cat's hook. Always `await next(e)` and draw its result above the cat's line; returning the cat alone hides every other mod's band.
 
 ## Maintainer preferences

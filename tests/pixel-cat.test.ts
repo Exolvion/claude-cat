@@ -53,11 +53,12 @@ const band = async ($: Engine) => {
   return found
 }
 
-// The band is the other mods' drawing above the cat's own line; this is that line.
+// The band is the other mods' drawing above the cat's own line, with the menu beside
+// both; this is the cat's line.
 type Drawn = { props: { height?: number; flexDirection?: string }; children?: Drawn[] }
 function catLine(drawn: unknown): Drawn {
-  const root = drawn as Drawn
-  return root.props.flexDirection === 'column' ? root.children!.at(-1)! : root
+  const stack = (drawn as Drawn).children![0]!
+  return stack.props.flexDirection === 'column' ? stack.children!.at(-1)! : stack
 }
 test('a new cat eats one kibble, then is too full for more', async ($, on) => {
   ground(on)
